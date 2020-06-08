@@ -1,0 +1,111 @@
+html,body {
+    margin: 0;
+    padding: 0;
+}
+#app {
+
+}
+
+.graph {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 150px 30px;
+}
+
+.node {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    width: 100px;
+    height: 40px;
+    border: 2px solid #dbdbdb;
+    box-sizing: border-box;
+    margin-right: 60px;
+    margin-bottom: 130px;
+}
+.node.select {
+    border-color: #3362db;
+}
+.node > .data {
+    flex: 1;
+    text-align: center;
+    line-height: 40px;
+}
+.node > .prev {
+    width: 30px;
+    background: darksalmon;
+}
+.node > .next {
+    width: 30px;
+    background: aquamarine;
+}
+.node > .points {
+    position: absolute;
+    bottom: 38px;
+    display: flex;
+}
+
+.point {
+    position: relative;
+    bottom: -10px;
+    width: 40px;
+}
+.point.select > .line {
+    background-color: #3362db;
+}
+.point.select > .angle {
+    border-top-color: #3362db;
+}
+.point > .line {
+    width: 2px;
+    height: 80px;
+    background-color: darksalmon;
+    margin: 0 auto;
+}
+.point > .angle {
+    width: 0;
+    height: 0;
+    border: 10px solid transparent;
+    border-top-color: darksalmon;
+    margin: 0 auto;
+}
+.point > .text {
+    position: absolute;
+    top: -20px;
+    font-size: 14px;
+}
+
+.actions {
+    width: 500px;
+    margin: 0 auto 150px auto;
+}
+
+label {
+    display: inline-block;
+    width: 80px;
+}
+input {
+    height: 40px;
+    line-height: 40px;
+    font-size: 18px;
+    outline: none;
+    background: #eee;
+    padding: 0 5px;
+    border: 1px solid transparent;
+    box-sizing: border-box;
+}
+input:focus {
+    border-color: aquamarine;
+}
+button {
+    font-size: 18px;
+    padding: 8px 15px;
+    border-radius: 4px;
+    outline: none;
+}
+button:active {
+    background: aquamarine;
+}
+.row {
+    padding: 10px 0;
+}

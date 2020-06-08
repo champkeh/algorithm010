@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+<div id="app">
+    <div class="actions">
+        <div class="row">
+            <label>节点值：</label>
+            <input type="text" v-model="dtext">
+            <button @click="addNode" :disabled="addNodeBtnDisabled">添加节点</button>
+        </div>
+        <div class="row">
+            <label>指针：</label>
+            <input type="text" v-model="ptext">
+            <button @click="addPoint" :disabled="addPointBtnDisabled">添加指针</button>
+        </div>
+        <div class="row">
+            <button class="prev" @click="movePoint('prev')">左移指针</button>
+            <button class="next" @click="movePoint('next')">右移指针</button>
+            <button class="remove" @click="remove">删除</button>
+        </div>
+    </div>
+    <div class="graph">
+        <div class="node" :class="{select: selectedNode?.id === node.id}" v-for="node in nodes" :key="node.id" @click="selectNode(node.id)">
+            <div class="data">{{node.data}}</div>
+            <div class="next"></div>
+            <div class="points" @click.stop>
+                <div class="point" :class="{select: selectedPoint?.id === point.id}" v-for="point in node.points" :key="point.id" @click="selectPoint(node.id, point.id)">
+                    <div class="line"></div>
+                    <div class="angle"></div>
+                    <span class="text">{{point.text}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="module">
+    let _nid = 0;
+    let _pid = 0;
+    const app = new Vue({
+        el: '#app',
+        data: {
+            dtext: '',
+            ptext: '',
+            nodes: [],
+            selectedNode: null,
+            selectedPoint: null,
+        },
+        computed: {
+            addNodeBtnDisabled() {
+                return !this.dtext.trim()
+            },
+            addPointBtnDisabled() {
+                return this.selectedNode === null || !this.ptext.trim()
+            }
+        },
+        mounted() {
+          this.nodes.push({ id: _nid++, data: '1', next: null, points: [] });
+        },
+        methods: {
+            addNode() {
+                if (this.dtext.trim()) {
+                    this.nodes.push({ id: _nid++, data: this.dtext.trim(), next: null, points: [] });
+                    this.dtext = ''
+                }
+            },
+            addPoint() {
+              if (this.selectedNode !== null && this.ptext.trim()) {
+                  const node = this.nodes.find(n => n.id === this.selectedNode.id);
+                  node.points.push({ id: _pid++, text: this.ptext.trim(), nid: this.selectedNode.id });
+                  this.ptext = '';
+              }
+            },
+            selectNode(nid) {
+                if (this.selectedNode?.id === nid) {
+                    this.selectedNode = null;
+                } else {
+                    this.selectedNode = this.nodes.find(n => n.id === nid);
+                }
+            },
+            selectPoint(nid, pid) {
+                if (this.selectedPoint?.id === pid) {
+                    this.selectedPoint = null;
+                } else {
+                    this.selectedPoint = this.nodes.find(n => n.id === nid).points.find(p => p.id === pid);
+                }
+            },
+            movePoint(dir) {
+                if (this.selectedPoint === null) {
+                    return
+                }
+                const node = this.nodes.find(n => n.id === this.selectedPoint.nid);
+                let targetNodeIdx = null;
+                if (dir === 'prev') {
+                    targetNodeIdx = this.nodes.indexOf(node) - 1
+                } else if (dir === 'next') {
+                    targetNodeIdx = this.nodes.indexOf(node) + 1
+                }
+
+                if (targetNodeIdx < 0 || targetNodeIdx > this.nodes.length-1) {
+                    // 超出边界
+                    return;
+                }
+
+                // 调整point内部指针
+                this.selectedPoint.nid = targetNodeIdx;
+                this.nodes[targetNodeIdx].points.push(this.selectedPoint);
+                node.points = node.points.filter(p => p.id !== this.selectedPoint.id);
+            },
+            remove() {
+                if (this.selectedPoint !== null) {
+                    const node = this.nodes.find(n => n.id === this.selectedPoint.nid);
+                    node.points = node.points.filter(p => p.id !== this.selectedPoint.id);
+                    this.selectedPoint = null;
+                }
+                if (this.selectedNode !== null) {
+                    this.nodes = this.nodes.filter(n => n.id !== this.selectedNode.id);
+                    this.selectedNode = null;
+                }
+            }
+        }
+    })
+</script>
+</body>
+</html>
