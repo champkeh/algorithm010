@@ -1,14 +1,15 @@
 ## 哈希表/散列表(Hash Table)
 
 > 散列思想：<br/>
-> 散列表用的是数组支持按照下标随机访问数据的特性，所以散列表其实就是数组的一种扩展，由数组演化而来。<br/>
-> 可以说，如果没有数组，就没有散列表。
+> 散列表利用的是数组支持以 O(1) 复杂度通过下标随机访问数据的特性，所以散列表其实就是数组的一种扩展，由数组演化而来。<br/>
+> 可以说，如果没有数组，就没有散列表。<br/>
+> 散列表支持插入、删除、查找<br/>
 
 ![](assets/hash-table.jpg)
 
-散列表用的就是数组支持按照下标随机访问的时候，时间复杂度是 O(1) 的特性。
-我们通过散列函数把元素的键值(key)映射为数组的下标，然后将数据存储在数组中对应下标的位置。
-当我们按照键值查询元素的时候，我们用同样的散列函数，将键值转化为数组下标，从对应的数组下标的位置取数据。
+我们通过散列函数把元素的键值(key)映射为数组的下标，然后将该数据存储在数组的对应下标的位置。
+当我们按照键值查询元素的时候，我们用同样的散列函数，将键值转化为数组下标，然后从数组中对应的下标位置取数据。
+因此，时间复杂度为 O(1)。
 
 ### 散列函数
 > 散列值 = hash(key)
@@ -24,10 +25,17 @@
 1.开放寻址法
 
 如果出现了散列冲突，我们就重新探测一个空闲位置，将数据插入。
-> 散列表支持插入、删除、查找
 
 ![](assets/open-address.jpg)
 
+- 优点
+  - 数据全部存储在数组中，可以利用 CPU 缓存加快查询速度
+  - 容易序列化
+- 缺点
+  - 删除数据时需要特殊标记，比较麻烦
+  - 冲突的代价比较大，只适合数据量小、装载因子小的情况
+
+#### 探测策略有以下几种
 - 线性探测
   - 每次探测的步长是1，探测的下标序列为 hash(key)+0, hash(key)+1, hash(key)+2, hash(key)+3, ...
 - 二次探测
@@ -43,12 +51,6 @@
 > 散列表的装载因子 = 填入表中的元素个数 / 散列表的长度<br/>
 > 装载因子越大，说明空闲位置越少，冲突越多，散列表的性能会下降。
 
-- 优点
-  - 数据全部存储在数组中，可以利用 CPU 缓存加快查询速度
-  - 容易序列化
-- 缺点
-  - 删除数据时需要特殊标记，较麻烦
-  - 冲突的代价比较大，只适合数据量小、装载因子小的情况
 
 2.链表法
 
@@ -73,17 +75,31 @@
 - map
   - key-value 对，key 不重复
   - new HashMap() / new TreeMap()
-  - map.set(key, value)
-  - map.get(key)
-  - map.has(key)
-  - map.size()
-  - map.clear()
 - set
   - 不重复元素的集合
   - new HashSet() / new TreeSet()
-  - set.add(value)
-  - set.delete(value)
-  - set.has(value)
+
+### Java 语言中的 HashTable 源码分析
+看文档可知，`HashTable`的性能会受2个参数的影响：`initial capacity`和`load factor`。
+`initial capacity`越大，占用空间越多，可能会浪费大量内存，但是会降低对`rehash`的需求，避免这个耗时操作。
+`load factor`越大，对空间的利用率越高，但会提高散列冲突的概率，导致查询性能退化。(查询性能会影响散列表的其他操作，比如`put`和`get`)
+
+`HashTable`内部会维护一个`table`数组，`get`操作如下：
+```java
+public synchronized V get(Object key) {
+    Entry<?,?> tab[] = table;
+    int hash = key.hashCode();
+    int index = (hash & 0x7FFFFFFF) % tab.length;
+    for (Entry<?,?> e = tab[index] ; e != null ; e = e.next) {
+        if ((e.hash == hash) && e.key.equals(key)) {
+            return (V)e.value;
+        }
+    }
+    return null;
+}
+```
+可以看出，散列函数为`(key.hashCode() & 0x7FFFFFFF) % tab.length`，是对底层数组的长度取模来把`key`映射到数组的`index`上，
+然后在通过遍历链表来查找。
 
 --- 
 
@@ -106,6 +122,8 @@
 节点的层数 = 节点的深度 + 1 <br/>
 树的高度 = 根节点的高度 <br/>
 ![](assets/height-depth-level.jpg)
+
+> 链表是特殊的树，树是特殊的图
 
 ### 二叉树
 
@@ -148,12 +166,15 @@
 ```
 前序遍历的递推公式：
 preOrder(root) = print root -> preOrder(root.left) -> preOrder(root.right)
+根 -> 左 -> 右
 
 中序遍历的递推公式：
 inOrder(root) = inOrder(root.left) -> print root -> inOrder(root.right)
+左 -> 根 -> 右
 
 后序遍历的递推公式：
 postOrder(root) = postOrder(root.left) -> postOrder(root.right) -> print root
+左 -> 右 -> 根
 
 层序遍历：
 借助队列辅助
@@ -162,8 +183,17 @@ postOrder(root) = postOrder(root.left) -> postOrder(root.right) -> print root
 
 ### 二叉搜索树
 
+#### 特点
+- 左子树上所有节点的值均小于它的根节点的值
+- 右子树上所有节点的值均大于它的根节点的值
+- 以此类推，左右子树也分别为二叉搜索树
+
+> 对二叉搜索树的中序遍历，是一个升序遍历<br/>
+> 因为中序遍历的顺序为：左 -> 根 -> 右
+
+
 ```
-二叉搜索树的查找：
+二叉搜索树的查询：
 function find(Node tree, int data) {
     Node p = tree;
     while (p !== null) {
