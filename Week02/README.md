@@ -5,7 +5,7 @@
 > 可以说，如果没有数组，就没有散列表。<br/>
 > 散列表支持插入、删除、查找<br/>
 
-![](assets/hash-table.jpg)
+![hash table](assets/hash-table.jpg)
 
 我们通过散列函数把元素的键值(key)映射为数组的下标，然后将该数据存储在数组的对应下标的位置。
 当我们按照键值查询元素的时候，我们用同样的散列函数，将键值转化为数组下标，然后从数组中对应的下标位置取数据。
@@ -26,7 +26,7 @@
 
 如果出现了散列冲突，我们就重新探测一个空闲位置，将数据插入。
 
-![](assets/open-address.jpg)
+![open address](assets/open-address.jpg)
 
 - 优点
   - 数据全部存储在数组中，可以利用 CPU 缓存加快查询速度
@@ -54,7 +54,7 @@
 
 2.链表法
 
-![](assets/linkedList.jpg)
+![linked list hash table](assets/linkedList.jpg)
 
 链表法相对开放寻址法简单很多。在散列表中，每个“桶(bucket)”或“槽(slot)”会对应一条链表，所有散列值相同的元素，
 我们都放在相同槽位对应的链表中。
@@ -104,7 +104,7 @@ public synchronized V get(Object key) {
 --- 
 
 ## 树
-![](assets/tree.jpg)
+![tree](assets/tree.jpg)
 
 ### 概念
 父节点
@@ -121,7 +121,7 @@ public synchronized V get(Object key) {
 节点的深度 = 根节点到该节点所经历的边的个数 <br/>
 节点的层数 = 节点的深度 + 1 <br/>
 树的高度 = 根节点的高度 <br/>
-![](assets/height-depth-level.jpg)
+![height depth level](assets/height-depth-level.jpg)
 
 > 链表是特殊的树，树是特殊的图
 
@@ -129,7 +129,7 @@ public synchronized V get(Object key) {
 
 > 每个节点最多有两个“叉”，分别被称为左子节点和右子节点
 
-![](assets/binary-tree.jpg)
+![binary tree](assets/binary-tree.jpg)
 
 #### 满二叉树
 1. 叶子节点全都在最底层
@@ -142,26 +142,23 @@ public synchronized V get(Object key) {
 
 #### 二叉树的存储
 1. 链式存储
-![](assets/binary-tree-linked-save.jpg)
+![binary tree linked save](assets/binary-tree-linked-save.jpg)
 基于指针或引用的二叉链式存储法，每个节点都有 left 和 right 两个指针分别指向左右子节点，通过根节点就可以访问整棵树。
 
 2. 顺序存储
-![](assets/binary-tree-array-save.jpg)
-基于数组的顺序存储法，根节点存储在下标 i=1 的位置，那么左子节点存储在下标 2*i=2 的位置，右子节点存储在 2*i+1=3 的位置。
+![binary tree array save](assets/binary-tree-array-save.jpg)
+基于数组的顺序存储法，根节点存储在下标 `i=1` 的位置，那么左子节点存储在下标 `2*i=2` 的位置，右子节点存储在 `2*i+1=3` 的位置。
 以此类推，如上图所示。
 这样通过下标计算，我们也可以访问整棵树。
 
-> 如果一棵树是完全二叉树，那么用数组存储无疑是最节省内存的方式。
-> 因为数组的存储方式并不需要存储额外的指针。
+> 如果一棵树是完全二叉树，那么用数组存储无疑是最节省内存的方式。<br/>
+> 因为数组的存储方式并不需要存储额外的指针。<br/>
+> 上面的存储方式会浪费一个内存空间，我们也可以把根节点存储在 `i=0` 的位置，那么他的左子节点就存储在 `2*i+1` 位置，
+> 他的右子节点存储在 `2*i+2` 位置，数组下标为 `i` 的父节点的下标为 `Math.floor((i-1)/2)`
 
 #### 二叉树的遍历
 前序遍历、中序遍历、后序遍历
-![](assets/tree-travse.jpg)
-
-前中后指的是节点与它的左右子树节点遍历的先后顺序。
-- 前序遍历：对于树中的任意节点，先遍历该节点，然后再遍历它的左子树，最后遍历它的右子树
-- 中序遍历：对于树中的任意节点，先遍历它的左子树，然后再遍历该节点，最后遍历它的右子树
-- 后序遍历：对于树中的任意节点，先遍历它的左子树，然后再遍历它的右子树，最后遍历该节点
+![tree travse](assets/tree-travse.jpg)
 
 ```
 前序遍历的递推公式：
@@ -178,22 +175,24 @@ postOrder(root) = postOrder(root.left) -> postOrder(root.right) -> print root
 
 层序遍历：
 借助队列辅助
-根节点入队，然后从队列取出一个节点，再将该节点的左右子节点依次入队，依次处理所有节点，直到队列为空。  
+根节点入队，然后从队列取出一个节点处理，将该节点的左右子节点依次入队，然后处理下一个节点，直到队列为空。  
 ```
 
-### 二叉搜索树
+### 二叉搜索树(Binary Search Tree, BST)
 
 #### 特点
 - 左子树上所有节点的值均小于它的根节点的值
 - 右子树上所有节点的值均大于它的根节点的值
 - 以此类推，左右子树也分别为二叉搜索树
 
+> 也就是说，这棵树是有序的，类似于跳表
+
 > 对二叉搜索树的中序遍历，是一个升序遍历<br/>
 > 因为中序遍历的顺序为：左 -> 根 -> 右
 
 
-```
-二叉搜索树的查询：
+二叉搜索树的查找：
+```js
 function find(Node tree, int data) {
     Node p = tree;
     while (p !== null) {
@@ -206,5 +205,72 @@ function find(Node tree, int data) {
         }
     }
     return null;
+}
+```
+
+
+二叉搜索树的插入：
+```js
+function insert(Node tree, int data) {
+    if (tree === null) {
+        tree = new Node(data);
+        return;
+    }
+
+    Node p = tree;
+    while (p !== null) {
+        if (data > p.data) {
+            if (p.right === null) {
+                p.right = new Node(data);
+                return;
+            }
+            p = p.right;
+        } else if (data < p.data) {
+            if (p.left === null) {
+                p.left = new Node(data);
+                return;
+            }
+            p = p.left;
+        }
+    }
+}
+```
+
+二叉搜索树的删除：
+```js
+function delete(Node tree, int data) {
+    Node p = tree; // p 指向要删除的节点
+    Node pp = null; // pp 记录 p 的父节点
+
+    while (p !== null && p.data !== data) {
+        pp = p;
+        if (data > p.data) p = p.right;
+        else p = p.left;
+    }
+    if (p === null) return; // 没有找到要删除的节点
+
+    // p 有两个子节点
+    if (p.left !== null && p.right !== null) {
+        Node minP = p.right;
+        Node minPP = p; // minPP 表示 minP 的父节点
+        
+        while (minP.left !== null) {
+            minPP = minP;
+            minP = minP.left;
+        }
+        p.data = minP.data; // 将 minP 的数据替换到 p 中
+        p = minP; // 下面要删除这个 minP
+        pp = minPP;
+    }
+
+    // p 是叶子节点或只有一个子节点
+    Node child; // p 的子节点
+    if (p.left !== null) child = p.left;
+    else if (p.right !== null) child = p.right;
+    else child = null;
+
+    if (pp === null) tree = child; // 删除的是根节点
+    else if (pp.left === p) pp.left = child;
+    else pp.right = child;
 }
 ```
